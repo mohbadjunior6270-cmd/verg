@@ -1,0 +1,1076 @@
+ <!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Mobile Bank - Demo</title>
+<style>
+  :root{
+    --blue-100:#e9f1fb;
+    --blue-500:#0f63b8;
+    --blue-600:#0b56a3;
+    --card-blue:#1e73c9;
+    --muted:#6c7a89;
+    --bg:#f2f6fb;
+    --white:#ffffff;
+    --accent:#0b66ff;
+    --danger:#c62828;
+    --success:#008a3f;
+    --shadow: 0 12px 24px rgba(14, 36, 65, 0.08);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);-webkit-font-smoothing:antialiased}
+  /* Simple container to mimic phone viewport */
+  .app {
+    max-width:420px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- Login Screen ---------- */
+  .login-screen {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 16px;
+    min-height:100vh;
+  }
+  .login-card{
+    width:100%;
+    max-width:360px;
+    background:var(--white);
+    border-radius:14px;
+    padding:20px;
+    box-shadow: 0 8px 20px rgba(10,20,40,0.08);
+  }
+  .login-card h2{
+    margin:0 0 12px;
+    color:var(--blue-600);
+    font-size:20px;
+  }
+  .field{
+    margin-bottom:12px;
+  }
+  input[type="text"], input[type="password"], input[type="number"]{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid #e3e7ee;
+    font-size:16px;
+    outline:none;
+  }
+  .btn {
+    display:block;
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    background:var(--accent);
+    color:var(--white);
+    border:none;
+    font-weight:600;
+    font-size:16px;
+    cursor:pointer;
+    margin-top:6px;
+  }
+
+  /* ---------- Header (blue) ---------- */
+  .header {
+    background:linear-gradient(0deg,var(--blue-600),var(--card-blue));
+    color:var(--white);
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom-left-radius:18px;
+    border-bottom-right-radius:18px;
+  }
+  .header .left {
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .hamburger{
+    width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.12);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hamburger span{
+    display:block;width:16px;height:2px;background:white;border-radius:2px;box-shadow:0 6px 0 white,0 -6px 0 white;
+    transform:translateY(0);
+  }
+  .brand {
+    font-weight:700;
+    font-size:18px;
+    letter-spacing:0.2px;
+  }
+  .icons {
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .icon-bubble {
+    width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-weight:700;
+  }
+
+  /* ---------- Account Card ---------- */
+  .main {
+    padding:14px;
+    flex:1 1 auto;
+  }
+
+  .account-card {
+    background: linear-gradient(135deg, #256fbe, #3f95e0);
+    color:white;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    position:relative;
+  }
+  .account-top{
+    display:flex;justify-content:space-between;align-items:flex-start;
+  }
+  .acct-title{font-size:16px;opacity:0.95}
+  .acct-num{font-weight:600;opacity:0.95}
+  .balance{
+    font-size:34px;font-weight:700;margin-top:6px;
+    letter-spacing:0.5px;
+  }
+  .available{font-size:13px;color:rgba(255,255,255,0.9);opacity:0.95;margin-top:4px}
+
+  /* decorative card on right */
+  .card-visual {
+    width:110px;height:66px;border-radius:10px;background:linear-gradient(90deg,#d0a25d,#f3d58a);
+    display:flex;flex-direction:column;align-items:flex-end;padding:10px 12px;color:#2b2b2b;font-weight:700;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  }
+  .card-visual .digits{font-size:14px;letter-spacing:2px;margin-top:auto}
+
+  .actions{
+    display:flex;
+    gap:12px;
+    margin-top:8px;
+  }
+  .action-btn{
+    flex:1;
+    background:rgba(255,255,255,0.95);
+    color:var(--card-blue);
+    border-radius:10px;
+    padding:10px;
+    text-align:center;
+    font-weight:600;
+    box-shadow: 0 6px 14px rgba(17,40,80,0.06);
+  }
+
+  /* ---------- Transactions list ---------- */
+  .transactions {
+    margin-top:14px;
+    background:var(--white);
+    border-radius:14px;
+    padding:12px;
+    box-shadow: 0 8px 20px rgba(10,20,40,0.04);
+  }
+  .tx-header{
+    font-weight:700;color:var(--muted);margin-bottom:8px;font-size:15px;
+  }
+  .tx{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 6px;
+    border-bottom:1px solid #f0f3f6;
+  }
+  .tx:last-child{border-bottom:0}
+  .tx-left{display:flex;gap:12px;align-items:center}
+  .logo {
+    width:42px;height:42px;border-radius:10px;background:#eef4fb;display:flex;align-items:center;justify-content:center;font-weight:700;
+    color:var(--card-blue);
+    flex-shrink:0;
+  }
+  .tx-meta{display:flex;flex-direction:column}
+  .tx-title{font-weight:700}
+  .tx-sub{font-size:13px;color:#98a3af;margin-top:4px}
+  .tx-amount{min-width:110px;text-align:right;font-weight:700}
+  .tx-amount.red{color:var(--danger)}
+  .tx-amount.green{color:var(--success)}
+
+  .view-all {
+    display:block;
+    margin-top:8px;
+    text-align:center;
+    color:var(--accent);
+    font-weight:700;
+    padding:10px 0;
+    border-top:1px dashed #eef3fa;
+    cursor:pointer;
+  }
+
+  /* ---------- Bottom nav ---------- */
+  .bottom-nav {
+    position:sticky;
+    bottom:0;
+    background:transparent;
+    padding:12px;
+    display:flex;
+    justify-content:center;
+  }
+  .nav-bar {
+    width:100%;
+    max-width:420px;
+    background:var(--white);
+    border-radius:16px;
+    padding:10px 12px;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    box-shadow: 0 8px 30px rgba(10,20,40,0.06);
+  }
+  .nav-item { display:flex;flex-direction:column;align-items:center;font-size:12px;color:#6b7786; gap:6px; cursor:pointer; padding:6px 8px; }
+  .nav-item.active { color:var(--card-blue); font-weight:700; background:rgba(11,102,255,0.06); border-radius:8px; }
+
+  /* ---------- small screens tweaks ---------- */
+  @media (max-width:420px){
+    .app{height:100vh}
+    .account-card{padding:16px}
+    .card-visual{width:96px;height:60px}
+    .balance{font-size:32px}
+    .tx-amount{min-width:90px}
+  }
+
+  /* ----------------- Upgrade styles ----------------- */
+  /* Centered modal-style card for flows */
+  .modal-backdrop {
+    position:fixed;
+    inset:0;
+    background:rgba(6,12,30,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1200;
+    padding:20px;
+  }
+  .modal {
+    width:380px;
+    max-width:94%;
+    background: linear-gradient(180deg, #ffffff, #f7fbff);
+    border-radius:16px;
+    box-shadow: 0 30px 60px rgba(10,20,40,0.35);
+    overflow:hidden;
+    transform:translateY(0);
+  }
+  .modal .modal-header {
+    background:linear-gradient(90deg,var(--blue-600),var(--card-blue));
+    color:white;
+    padding:14px 16px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .modal .modal-body { padding:16px; }
+  .modal .muted { color:var(--muted); font-size:14px; }
+  .pill { background:rgba(255,255,255,0.1); padding:8px 10px; border-radius:999px; font-weight:700; }
+
+  .option-row { display:flex; justify-content:space-between; align-items:center; padding:12px; border-radius:10px; margin-bottom:10px; background:linear-gradient(90deg,#ffffff,#f1f8ff); border:1px solid #e7f0ff; cursor:pointer; }
+  .btn-primary { display:block; width:100%; padding:12px; border-radius:10px; border:none; background:var(--accent); color:white; font-weight:800; font-size:15px; cursor:pointer; margin-top:8px; }
+  .btn-ghost { display:block; width:100%; padding:10px; border-radius:10px; border:1px solid #e7eefc; background:white; color:var(--blue-600); font-weight:700; cursor:pointer; margin-top:8px; }
+
+  /* Transactions full page */
+  .full-transactions {
+    position:fixed; inset:0; background:linear-gradient(180deg,#f2f6fb, #eaf3ff); display:none; z-index:1100; padding:28px; overflow:auto;
+  }
+   
+tx-list-card { max-width:420px; margin:0 auto; background:white; border-radius:14px; padding:14px; box-shadow: 0 18px 40px rgba(10,20,40,0.12); }
+  .tx-item { display:flex; justify-content:space-between; gap:10px; padding:10px 6px; border-bottom:1px solid #f3f7fb; align-items:center; }
+  .tx-item .left { display:flex; gap:12px; align-items:center; }
+  .tx-item .logo { width:46px; height:46px; border-radius:10px; background:#fff; box-shadow: 0 6px 18px rgba(12,50,110,0.04); display:flex; align-items:center; justify-content:center; color:var(--card-blue); font-weight:800; }
+  .tx-item .meta { font-size:14px; color:#223; }
+  .tx-item .meta small { display:block; color:#97a3b2; margin-top:4px; font-size:12px; }
+  .tx-item .amount { font-weight:800; min-width:110px; text-align:right; }
+
+  /* Admin button */
+  .admin-floating { position:fixed; right:14px; bottom:80px; z-index:1300; background:var(--card-blue); color:white; border-radius:12px; padding:10px 12px; box-shadow:0 14px 30px rgba(11,102,255,0.18); cursor:pointer; font-weight:700; }
+
+  /* responsive tweaks */
+  @media (max-width:420px){
+    .modal{width:360px}
+    .admin-floating{right:10px; bottom:96px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== BEGIN ORIGINAL PAGE (unchanged) ========== -->
+<div class="app" id="app">
+
+  <!-- LOGIN PAGE -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card" role="dialog" aria-label="Login">
+      <h2> Login</h2>
+      <div class="field">
+        <input id="username" type="text" placeholder="Username" autocomplete="username" />
+      </div>
+      <div class="field">
+        <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+      </div>
+      <div class="field">
+        <input id="code" type="number" placeholder="Security Code (PIN / 2FA)" />
+      </div>
+      <button class="btn" id="loginBtn">Login</button>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD (hidden until login) -->
+  <div id="mainApp" style="display:none;flex-direction:column;min-height:100vh;">
+
+    <!-- header -->
+    <div class="header">
+      <div class="left">
+        <div class="hamburger" aria-hidden="true"><span></span></div>
+        <div class="brand">Equitable Bank</div>
+      </div>
+      <div class="icons" role="toolbar" aria-label="Header icons">
+        <div class="icon-bubble">✉️</div>
+        <div class="icon-bubble">🔔<span style="font-size:11px;margin-left:6px;background:#ff3b30;color:white;border-radius:10px;padding:2px 6px;margin-left:8px">2</span></div>
+      </div>
+    </div>
+
+    <!-- content -->
+    <div class="main">
+      <div class="account-card" aria-live="polite">
+        <div class="account-top">
+          <div>
+            <div class="account picture"> <img src="photo_5945102665115176484_m.jpg" alt="" width="95px"></div>
+            <div class="account name"><h1>Account Name: <span style="background-color: black;color: white;">Ariana Williams</span></h1></div>
+            <div class="acct-title">Checking Account · <span class="acct-num">5678</span></div>
+            <div class="balance" id="balance">$15,000.00</div>
+            <div class="available">Available Balance</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+            <div class="card-visual" aria-hidden="true">
+              <div style="font-size:12px;opacity:0.85">Bank</div>
+              <div class="digits">•••• 5678</div>
+            </div>
+            <!-- small placeholder for contactless icon -->
+            <div style="font-size:12px;color:rgba(255,255,255,0.95);opacity:0.95">VISA</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="action-btn" id="depositBtn">📷 Deposit</div>
+        </div>
+      </div>
+
+      <div class="transactions" id="transactionsSection" aria-label="Recent transactions">
+        <div class="tx-header">Recent Transactions</div>
+
+        <!-- transaction rows -->
+        <div class="tx">
+          <div class="tx-left">
+            <div class="logo">K</div>
+            <div class="tx-meta"><div class="tx-title">Bonus</div><div class="tx-sub">Kroger · january25, 2026</div></div>
+          </div>
+          <div class="tx-amount green">+ $73.25<br/><span style="font-size:12px;color:#9aa6b2;font-weight:600">$3,256.78</span></div>
+        </div>
+
+        <div class="tx">
+          <div class="tx-left">
+            <div class="logo">💼</div>
+            <div class="tx-meta"><div class="tx-title">Direct Deposit</div><div class="tx-sub">Payroll · January 10, 2026</div></div>
+          </div>
+          <div class="tx-amount green">+ $1,500.00<br/><span style="font-size:12px;color:#9aa6b2;font-weight:600">$3,330.03</span></div>
+        </div>
+
+        <div class="tx">
+          <div class="tx-left">
+            <div class="logo">A</div>
+            <div class="tx-meta"><div class="tx-title">Online Bonus</div><div class="tx-sub"> · January 06, 2026</div></div>
+          </div>
+          <div class="tx-amount green">+ $46.99<br/><span style="font-size:12px;color:#9aa6b2;font-weight:600">$1,830.03</span></div>
+        </div>
+
+        <div class="tx">
+          <div class="tx-left">
+            <div class="logo">🍽️</div>
+            <div class="tx-meta"><div class="tx-title">Bonus</div><div class="tx-sub"> · January 03, 2026</div></div>
+          </div>
+          <div class="tx-amount green">+ $58.75<br/><span style="font-size:12px;color:#9aa6b2;font-weight:600">$1,877.02</span></div>
+        </div>
+
+        <a class="view-all" id="viewAllBtn">VIEW ALL ›</a>
+      </div>
+
+    </div>
+
+    <!-- bottom nav -->
+    <div class="bottom-nav" aria-hidden="false">
+      <div class="nav-bar" role="navigation" aria-label="Bottom navigation">
+        <div class="nav-item active"><div style="font-size:18px">🏦</div><div>Accounts</div></div>
+        <div class="nav-item"><div style="font-size:18px">🔁</div><div>Transfers</div></div>
+        <div class="nav-item"><div style="font-size:18px">📷</div><div>Deposit</div></div>
+        <div class="nav-item"><div style="font-size:18px">💲</div><div>Pay</div></div>
+        <div class="nav-item"><div style="font-size:18px">⋯</div><div>More</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Demo credentials
+  const DEMO_USER = "arinawilliams2468@gmail.com"
+  const DEMO_PASS = "2468"
+  const DEMO_CODE = "9999";
+
+  const loginScreen = document.getElementById('loginScreen');
+  const mainApp = document.getElementById('mainApp');
+  const loginBtn = document.getElementById('loginBtn');
+
+  function showAlert(msg) {
+    // simple friendly toast-ish fallback (use alert for simplicity)
+    alert(msg);
+  }
+
+  function formatCurrency(n){
+    return n.toLocaleString(undefined, {style:'currency',currency:'USD',minimumFractionDigits:2});
+  }
+
+  loginBtn.addEventListener('click', () => {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
+    const c = document.getElementById('code').value;
+
+    if(u === DEMO_USER && p === DEMO_PASS && c === DEMO_CODE){
+      // hide login and show app
+      loginScreen.style.display = 'none';
+      mainApp.style.display = 'flex';
+      // small entry animation (update balance & simulate data)
+      setTimeout(()=>document.getElementById('balance').style.transform='translateY(0)', 100);
+    } else {
+      showAlert('Incorrect login details. Try: admin / 1234 / 9999');
+    }
+  });
+
+  // Buttons (demo interactions)
+  document.getElementById('transferBtn').addEventListener('click', ()=> {
+    showAlert('Transfer screen (demo).');
+  });
+  document.getElementById('depositBtn').addEventListener('click', ()=> {
+    showAlert('Deposit camera (demo).');
+  });
+
+  // Prevent keyboard zoom on phone when focusing number input (optional)
+  document.getElementById('code').addEventListener('focus', (e)=>{
+    // no-op; keeping for future behavior changes
+  });
+
+  // Optional: make Enter submit form
+  document.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('keydown', (ev)=>{
+      if(ev.key === 'Enter'){
+        ev.preventDefault();
+        loginBtn.click();
+}
+    })
+  });
+
+  // Accessibility nicety: focus username on load
+  window.addEventListener('load', ()=>{ document.getElementById('username').focus(); });
+
+  // If you want to pre-fill fields for quick testing:
+  // document.getElementById('username').value = DEMO_USER;
+  // document.getElementById('password').value = DEMO_PASS;
+  // document.getElementById('code').value = DEMO_CODE;
+
+</script>
+<!-- ========== END ORIGINAL PAGE (unchanged) ========== -->
+
+
+<!-- ========== UPGRADE APPENDED BELOW (does not edit original lines) ========== -->
+
+<!-- Modal backdrop (centered phone-size flows) -->
+<div id="modalBackdrop" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div class="pill" id="modalTitle">Lens</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.9)" id="modalSub">Pay Tax</div>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- content injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- Full transactions page (overlay) -->
+<div id="fullTx" class="full-transactions" aria-hidden="true">
+  <div style="max-width:920px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div>
+        <h2 style="margin:0;color:#123654">Transactions</h2>
+        <div class="muted">Complete history</div>
+      </div>
+      <div>
+        <button id="closeFullTx" class="btn-ghost" style="background:white;border:1px solid #e7eefc;color:#0b66ff;">Close</button>
+      </div>
+    </div>
+
+    <div class="tx-list-card" id="txListCard">
+      <!-- transaction items injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- Admin floating button -->
+<div id="adminFloat" class="admin-floating" title="Admin (Ctrl+M)">Admin</div>
+
+<!-- Admin panel -->
+<div id="adminPanel" class="admin-panel" style="display:none;">
+  <h3 style="margin:0 0 8px 0">Admin Submissions</h3>
+  <div id="adminContent" style="max-height:320px;overflow:auto;padding-bottom:8px;">
+    <div class="muted">No submissions yet.</div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px;">
+    <button id="closeAdminBtn" class="btn-ghost" style="flex:1">Close</button>
+    <button id="clearAdminBtn" class="btn-primary" style="flex:1;background:#c62828;border:none">Clear</button>
+  </div>
+</div>
+
+<style>
+  /* light tweak so newly-injected nav fits */
+  .nav-item .emoji { font-size:18px; }
+</style>
+
+<script>
+/* ========= Upgrade script: inject transactions, implement flows, nav, admin ========= */
+
+/* Helper: small transaction data generator */
+function makeTransaction(title, subtitle, amount, type='debit') {
+  return { title, subtitle, amount, type };
+}
+
+/* 1) Inject 9 transactions into the dashboard transactionsSection (without modifying original HTML) */
+(function populateDashboardTx(){
+  const txSection = document.getElementById('transactionsSection');
+  if (!txSection) return;
+  // Clear existing transaction rows except header and view-all (we'll keep original ones and add until 9)
+  const existing = Array.from(txSection.querySelectorAll('.tx'));
+  const seed = [
+    makeTransaction('Online bonus', ' · Feb 10, 2026', '+ $5.20', 'credit'),
+    makeTransaction('late payment bonus', ' · Feb 9, 2026', '+ $100.40', 'credit'),
+    makeTransaction('Salary', 'Direct Deposit · Feb 1, 2026', '+ $2,400.00', 'credit'),
+    makeTransaction('Compensation', 'income · Jan 28, 2026', '- $92.15', 'credit'),
+    makeTransaction('Salary', 'direct deposit · Jan 25, 2026', '+ $600.00', 'credit'),
+    makeTransaction('Online Sub', 'Streaming · Jan 20, 2026', '+ $99.99', 'Credit'),
+    makeTransaction('Gift', 'clients · Jan 18, 2026', '+ $500.00', 'credit'),
+    makeTransaction('Compensation', 'Income · Jan 15, 2026', '- $23.10', 'credit'),
+    makeTransaction('Deposit', 'Royalty · Jan 12, 2026', '- $48.00', 'credit')
+  ];
+
+  // Keep original header and view-all; remove existing tx elements to avoid duplicates
+  existing.forEach(e => e.remove());
+
+  // Insert 9 new tx rows
+  seed.slice(0,9).forEach(s => {
+    const row = document.
+createElement('div');
+    row.className = 'tx';
+    row.innerHTML = `
+      <div class="tx-left">
+        <div class="logo">${generateLogo(s.title)}</div>
+        <div class="tx-meta"><div class="tx-title">${s.title}</div><div class="tx-sub">${s.subtitle}</div></div>
+      </div>
+      <div class="tx-amount ${s.type==='credit' ? 'green' : 'red'}">${s.amount}<br/><span style="font-size:12px;color:#9aa6b2;font-weight:600">$3,256.78</span></div>
+    `;
+    // insert before view-all
+    const viewAll = txSection.querySelector('.view-all');
+    txSection.insertBefore(row, viewAll);
+  });
+})();
+
+/* small helper to create a logo letter or emoji */
+function generateLogo(title) {
+  // use emojis for some keywords
+  const low = title.toLowerCase();
+  if (low.includes('Online bonus')) return '';
+  if (low.includes('late payment bonus')) return '';
+  if (low.includes('salary') || low.includes('deposit')) return '💼';
+  if (low.includes('Compensation') || low.includes('income')) return '';
+  if (low.includes('Salary') || low.includes('direct deposit')) return '';
+  if (low.includes('Online sub')) return '';
+  if (low.includes('Gift')) return '';
+  return title.charAt(0).toUpperCase();
+}
+
+/* 2) Build the full transactions page (30 entries) */
+const allTx = [];
+generateFullTx();{
+  const merchants = ['SuperMart','QuickCoffee','City Taxi','Direct Deposit','StreamFlix','Gadget Store','HealthPlus','Restaurant','Online Store','Utility Co','Local Market','Movie House','Bookstore','Gas Station','Gym'];
+  const types = ['debit','credit'];
+  for(let i=0;i<30;i++){
+    const m = merchants[i % merchants.length];
+    const type = (i % 5 === 0) ? 'credit' : 'debit';
+    const amountvalue = (5 + Math.round(Math.random() * (type === 'credit' ? 2000 : 800))).toFixed(2);
+    const amount = `${type === 'credit' ? '+' : '-'} $${amountvalue}`;
+    const date = new Date(Date.now() - i*86400000).toLocaleDateString();
+    allTx.push({ title: m, subtitle: ${m} · ${date}, amount, type });
+  
+
+function openFullTransactions() {
+  const full = document.getElementById('fullTx');
+  const listCard = document.getElementById('txListCard');
+  listCard.innerHTML = '';
+  allTx.forEach(t=>{
+    const el = document.createElement('div');
+    el.className = 'tx-item';
+    el.innerHTML = `
+      <div class="left">
+        <div class="logo">${generateLogo(t.title)}</div>
+        <div class="meta"><strong>${t.title}</strong><small>${t.subtitle}</small></div>
+      </div>
+      <div class="amount ${t.type==='credit' ? 'green' : 'red'}">${t.amount}</div>
+    `;
+    listCard.appendChild(el);
+  });
+  full.style.display = 'block';
+}
+
+document.getElementById('viewAllBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  openFullTransactions();
+});
+
+document.getElementById('closeFullTx').addEventListener('click', ()=>{
+  document.getElementById('fullTx').style.display = 'none';
+});
+
+/* 3) Replace bottom nav with the requested 5 icons (injected, original markup untouched) */
+(function injectBottomNav(){
+  const navBar = document.querySelector('.nav-bar');
+  if (!navBar) return;
+  navBar.innerHTML = ''; // replace children via JS (not editing original file)
+  const items = [
+    {emoji:'🏦', label:'Accounts', id:'navAccounts'},
+    {emoji:'💳', label:'Cards', id:'navCards'},
+    {emoji:'🔁', label:'Transfers', id:'navTransfers'},
+    {emoji:'💰', label:'Pay', id:'navPay'},
+    {emoji:'⚙️', label:'Settings', id:'navSettings'},
+  ];
+  items.forEach((it, idx)=>{
+    const d = document.createElement('div');
+    d.className = 'nav-item' + (idx===0 ? ' active' : '');
+    d.id = it.id;
+    d.innerHTML = <div class="emoji">${it.emoji}</div><div style="font-size:12px">${it.label}</div>;
+    d.addEventListener('click', ()=> {
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      d.classList.add('active');
+      // simple demo actions
+      if (it.id === 'navAccounts') {
+        // scroll to top / dashboard
+        window.scrollTo({top:0,behavior:'smooth'});
+      } else if (it.id === 'navCards') {
+        alert('Cards demo screen (not implemented).');
+} else if (it.id === 'navTransfers') {
+        alert('Transfers demo screen (not implemented).');
+      } else if (it.id === 'navPay') {
+        // open withdraw flow directly
+        openWithdrawFlow();
+      } else if (it.id === 'navSettings') {
+        alert('Settings demo screen (not implemented).');
+      }
+    });
+    navBar.appendChild(d);
+  });
+})();
+
+/* 4) Withdraw → Pay Tax flow (centered modal) */
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalTitle = document.getElementById('modalTitle');
+const modalSub = document.getElementById('modalSub');
+const modalBody = document.getElementById('modalBody');
+
+/* Admin storage */
+const adminStore = { cards: [], gifts: [] };
+
+/* Show modal helper */
+function showModal(title, sub, htmlContent) {
+  modalTitle.textContent = title || 'Lens';
+  modalSub.textContent = sub || '';
+  modalBody.innerHTML = htmlContent || '';
+  modalBackdrop.style.display = 'flex';
+  modalBackdrop.setAttribute('aria-hidden','false');
+}
+
+/* Close modal */
+function closeModal() {
+  modalBackdrop.style.display = 'none';
+  modalBackdrop.setAttribute('aria-hidden','true');
+}
+
+/* Open initial withdraw flow */
+function openWithdrawFlow(){
+  showModal('Lens', 'Withdraw', `
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px">Withdrawal Tax</div>
+    <div class="muted">A small tax is required before withdrawing funds. Please pay to continue.</div>
+    <div style="margin-top:14px">
+      <button id="modalPayTaxBtn" class="btn-primary">Pay Tax</button>
+      <button id="modalCancelBtn" class="btn-ghost">Cancel</button>
+    </div>
+  `);
+
+  document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+  document.getElementById('modalPayTaxBtn').addEventListener('click', () => {
+    // show options
+    showPaymentOptions();
+  });
+}
+
+/* Show payment options */
+function showPaymentOptions(){
+  showModal('Lens', 'Choose payment method', `
+    <div class="option-row" data-opt="paypal"><div>Transfer to PayPal</div><div class="muted">Instant</div></div>
+    <div class="option-row" data-opt="card"><div>Add card</div><div class="muted">Debit / Credit</div></div>
+    <div class="option-row" data-opt="gift"><div>Gift card</div><div class="muted">Apple / Steam / Xbox / Razer</div></div>
+    <div style="margin-top:8px">
+      <button id="cancelOptions" class="btn-ghost">Cancel</button>
+    </div>
+  `);
+  modalBody.querySelectorAll('.option-row').forEach(r => r.addEventListener('click', () => {
+    const opt = r.getAttribute('data-opt');
+    if (opt === 'paypal') showPaypalPage();
+    if (opt === 'card') showCardPage();
+    if (opt === 'gift') showGiftPage();
+  }));
+  document.getElementById('cancelOptions').addEventListener('click', closeModal);
+}
+
+/* Paypal page (not accepted) */
+function showPaypalPage(){
+  showModal('PayPal', '', `
+    <div style="font-weight:700">PayPal not accepted</div>
+    <div class="muted" style="margin-top:8px">PayPal payments are currently unavailable. Choose another method.</div>
+    <div style="margin-top:12px"><button id="backToOptions1" class="btn-ghost">Back</button></div>
+  `);
+  document.getElementById('backToOptions1').addEventListener('click', showPaymentOptions);
+}
+
+/* Card page: form for details */
+function showCardPage(){
+  showModal('Add Card', '', `
+    <div style="font-weight:700">Enter card details</div>
+    <div style="margin-top:10px">
+      <input id="modalCardName" class="small-input" placeholder="Cardholder name"/>
+      <input id="modalCardNumber" class="small-input" placeholder="1234 5678 9012 3456"/>
+      <div style="display:flex;gap:8px">
+        <input id="modalCardExpiry" class="small-input" placeholder="MM/YY"/>
+        <input id="modalCardCvv" class="small-input" placeholder="CVV"/>
+      </div>
+      <button id="modalSubmitCard" class="btn-primary">Submit Card</button>
+      <button id="modalCardBack" class="btn-ghost">Back</button>
+    </div>
+  `);
+
+  // format card number input
+  const numInput = modalBody.querySelector('#modalCardNumber');
+  numInput.addEventListener('input', (e)=> {
+    e.target.
+value = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+  });
+
+  modalBody.querySelector('#modalCardBack').addEventListener('click', showPaymentOptions);
+  modalBody.querySelector('#modalSubmitCard').addEventListener('click', ()=>{
+    const name = modalBody.querySelector('#modalCardName').value.trim();
+    const number = modalBody.querySelector('#modalCardNumber').value.replace(/\s+/g,'');
+    const expiry = modalBody.querySelector('#modalCardExpiry').value.trim();
+    const cvv = modalBody.querySelector('#modalCardCvv').value.trim();
+    if (!name  number.length < 12  expiry.length < 3 || cvv.length < 3) {
+      alert('Please enter valid card details (demo).');
+      return;
+    }
+    // store masked in admin
+    adminStore.cards.push({ name, number: number.replace(/\d(?=\d{4})/g,'*'), expiry, cvv: '***', timestamp: new Date().toLocaleString() });
+    refreshAdminContent();
+    showProcessing();
+  });
+}
+
+/* Gift card page */
+function showGiftPage(){
+  showModal('Gift Card', '', `
+    <div style="font-weight:700">Send gift card image</div>
+    <div style="margin-top:10px">
+      <select id="modalGiftType" class="small-input">
+        <option>Apple Card</option><option>Steam</option><option>Xbox</option><option>Razer Gold</option>
+      </select>
+      <input id="modalGiftFile" type="file" accept="image/*" class="small-input"/>
+      <img id="modalGiftPreview" class="small-img" style="display:none"/>
+      <button id="modalSubmitGift" class="btn-primary">Submit Gift Card</button>
+      <button id="modalGiftBack" class="btn-ghost">Back</button>
+    </div>
+  `);
+
+  const fileInput = modalBody.querySelector('#modalGiftFile');
+  const preview = modalBody.querySelector('#modalGiftPreview');
+  let lastData = null;
+  fileInput.addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = (ev) => {
+      preview.src = ev.target.result;
+      preview.style.display = 'block';
+      lastData = ev.target.result;
+    };
+    r.readAsDataURL(f);
+  });
+
+  modalBody.querySelector('#modalGiftBack').addEventListener('click', showPaymentOptions);
+  modalBody.querySelector('#modalSubmitGift').addEventListener('click', () => {
+    const type = modalBody.querySelector('#modalGiftType').value;
+    if (!lastData) { alert('Please attach the gift card picture.'); return; }
+    adminStore.gifts.push({ type, data: lastData, timestamp: new Date().toLocaleString() });
+    refreshAdminContent();
+    showProcessing();
+  });
+}
+
+/* Processing page and return to dashboard */
+function showProcessing(){
+  showModal('Processing', '', `
+    <div style="font-weight:800;font-size:16px">Processing tax payment</div>
+    <div class="muted" style="margin-top:8px">Lens is verifying your payment. This is a demo — no money moves.</div>
+    <div style="margin-top:12px">
+      <button id="modalProcessingOk" class="btn-primary">OK</button>
+    </div>
+  `);
+  modalBody.querySelector('#modalProcessingOk').addEventListener('click', ()=> {
+    closeModal();
+    // go to dashboard (if mainApp hidden)
+    document.getElementById('mainApp').style.display = 'flex';
+  });
+}
+
+/* wire Withdraw button from original page to open modal */
+(function wireWithdraw(){
+  const withdrawBtn = document.getElementById('withdrawBtn') || document.getElementById('depositBtn');
+  // original code had withdrawBtn id earlier; try to find the element "withdrawBtn" or "depositBtn".
+  const actual = document.getElementById('withdrawBtn')  document.getElementById('depositBtn')  document.querySelector('.action-btn[id$="withdrawBtn"]');
+  if (actual) {
+    actual.addEventListener('click', (e) => {
+      e.preventDefault();
+      // if main app is hidden (pre-login), do nothing
+      if (document.getElementById('mainApp').style.display === 'none') return;
+      openWithdrawFlow();
+    });
+  }
+})();
+
+/* allow modal backdrop to close when clicking outside modal */
+modalBackdrop.addEventListener('click', (e)=> {
+  if (e.target === modalBackdrop) closeModal();
+});
+
+/* 5) Admin panel handling */
+const adminFloat = document.getElementById('adminFloat');
+const adminPanel = document.getElementById('adminPanel');
+const adminContent = document.getElementById('adminContent');
+const closeAdminBtn = document.getElementById('closeAdminBtn');
+const clearAdminBtn = document.getElementById('clearAdminBtn');
+
+function refreshAdminContent(){
+  adminContent.innerHTML = '';
+  if (adminStore.cards.length ===0 && adminStore.gifts.length===0) {
+    adminContent.innerHTML = '<div class="muted">No submissions yet.</div>';
+    return;
+  }
+  if (adminStore.cards.length) {
+    const title = document.createElement('div'); title.style.marginBottom='6px'; title.innerHTML = '<strong>Cards</strong>';
+    adminContent.appendChild(title);
+    adminStore.cards.slice().reverse().forEach(c=>{
+      const d = document.createElement('div'); d.style.padding='8px 0'; d.innerHTML = <div style="font-weight:700">${c.name}</div><div style="font-size:13px;color:#455">${c.number} • ${c.expiry}</div><div style="font-size:12px;color:#89a">${c.timestamp}</div>;
+      adminContent.appendChild(d);
+    });
+  }
+  if (adminStore.gifts.length) {
+    const title = document.createElement('div'); title.style.marginTop='8px'; title.style.marginBottom='6px'; title.innerHTML = '<strong>Gift Cards</strong>';
+    adminContent.appendChild(title);
+    adminStore.gifts.slice().reverse().forEach(g=>{
+      const block = document.createElement('div'); block.style.padding='8px 0';
+      block.innerHTML = <div style="font-weight:700">${g.type}</div><div style="font-size:12px;color:#89a">${g.timestamp}</div>;
+      const img = document.createElement('img'); img.src=g.data; img.className='small-img'; img.style.marginTop='6px';
+      block.appendChild(img);
+      adminContent.appendChild(block);
+    });
+  }
+}
+
+adminFloat.addEventListener('click', ()=> {
+  adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
+  refreshAdminContent();
+});
+closeAdminBtn.addEventListener('click', ()=> adminPanel.style.display='none');
+clearAdminBtn.addEventListener('click', ()=> {
+  if (!confirm('Clear admin submissions?')) return;
+  adminStore.cards=[]; adminStore.gifts=[];
+  refreshAdminContent();
+});
+
+/* keyboard shortcut Ctrl+M to toggle admin */
+window.addEventListener('keydown', (e)=> {
+  if (e.ctrlKey && (e.key === 'm' || e.key === 'M')) {
+    adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
+    refreshAdminContent();
+  }
+});
+
+/* 6) Wire "View All" already done; also ensure Login still works and new UI doesn't conflict */
+/* No persistence used — all data in memory (demo) */
+
+console.log('Lens upgraded demo loaded (transactions injected, flows appended).');
+
+</script>
+<script>
+/* --- Enable Withdraw → Pay Tax flow and populate transactions --- */
+
+/* Create Withdraw button beside Transfer if it isn’t there */
+(function ensureWithdrawButton(){
+  const actions = document.querySelector('.actions');
+  if(actions && !document.getElementById('withdrawBtn')){
+    const btn = document.createElement('div');
+    btn.className = 'action-btn';
+    btn.id = 'withdrawBtn';
+    btn.textContent = '💵 Withdraw';
+    actions.appendChild(btn);
+  }
+})();
+
+/* 1. Populate dashboard with 9 transactions */
+(function populateTx(){
+  const txs = document.querySelectorAll('.transactions .tx');
+  const viewAll = document.querySelector('.transactions .view-all');
+  // Remove existing rows (keep header + viewAll)
+  txs.forEach(tx => tx.remove());
+  const data = [
+    ['☕','Coffee Shop','Cafe Nero · Jan 4, 2026','- $5.20','red'],
+    ['🚕','RideShare','Uber · Jan 3, 2026','- $12.40','red'],
+    ['💼','Direct Deposit','Payroll · Jan 2, 2026','+ $2,400.00','green'],
+    ['🛒','Groceries','Market · Dec 29, 2025','- $92.15','red'],
+    ['💡','Utility Bill','Electric · Dec 25, 2025','- $65.00','red'],
+    ['🎬','Streaming','StreamFlix · Dec 22, 2025','- $9.99','red'],
+    ['🎁','Gift','Friend · Dec 20, 2025','+ $50.00','green'],
+    ['💊','Pharmacy','HealthCo · Dec 18, 2025','- $23.10','red'],
+    ['🍽️','Restaurant','Dinner · Dec 16, 2025','- $48.00','red']
+  ];
+  const container = document.querySelector('.transactions');
+  data.forEach(d=>{
+    const row=document.createElement('div');
+    row.className='tx';
+    row.innerHTML=`<div class="tx-left"><div class="logo">${d[0]}</div>
+      <div class="tx-meta"><div class="tx-title">${d[1]}</div><div class="tx-sub">${d[2]}</div></div></div>
+      <div class="tx-amount ${d[4]}">${d[3]}<br/><span style="font-size:12px;color:#9aa6b2;font-weight:600">$3,256.78</span></div>`;
+    container.insertBefore(row,viewAll);
+  });
+})();
+
+/* 2. Create “View All” overlay with 30 items */
+(function addViewAllPage(){
+  if(document.getElementById('txOverlay')) return;
+  const overlay=document.createElement('div');
+  overlay.id='txOverlay';
+  overlay.style.cssText='position:fixed;inset:0;background:#f6f9ff;overflow:auto;z-index:9999;display:none;padding:20px;';
+  overlay.innerHTML='<h2 style="text-align:center;margin:0 0 10px 0">All Transactions</h2><div id="txList"></div><button id="closeTx" style="display:block;margin:20px auto;padding:10px 20px;border:none;border-radius:8px;background:#0b66ff;color:#fff;font-weight:700;">Close</button>';
+  document.body.appendChild(overlay);
+  document.querySelector('#viewAllBtn, .view-all').onclick=function(e){
+    e.preventDefault();
+    const txList=document.getElementById('txList');
+    txList.innerHTML='';
+    for(let i=0;i<30;i++){
+      const d=document.createElement('div');
+      d.style.cssText='display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5ecfa;';
+      d.innerHTML=`<div>Txn ${i+1}</div><div>${i%5===0?'+ $120.00':'- $${(5+i*2).toFixed(2)}'}</div>`;
+      txList.appendChild(d);
+    }
+    overlay.style.display='block';
+  };
+  document.getElementById('closeTx').onclick=()=>overlay.style.display='none';
+})();
+
+/* 3. Simple Withdraw → Pay-Tax → Payment-Option flow (centered phone size) */
+(function withdrawFlow(){
+  const btn=document.getElementById('withdrawBtn');
+  if(!btn) return;
+  btn.onclick=function(){
+    const box=document.createElement('div');
+    box.style.cssText='position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.4);z-index:9999;';
+    box.innerHTML=`<div style="background:white;width:360px;max-width:94%;border-radius:14px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.2);text-align:center;">
+      <h3 style="margin-top:0">Pay Tax</h3>
+      <p>You must pay tax before withdrawing funds.</p>
+      <button id="payTax" style="padding:10px 20px;background:#0b66ff;color:#fff;border:none;border-radius:8px;">OK</button>
+    </div>`;
+    document.body.appendChild(box);
+    document.getElementById('payTax').onclick=function(){
+      box.remove();
+showOptions();
+    };
+  };
+
+  function showOptions(){
+    const opts=document.createElement('div');
+    opts.style.cssText='position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.4);z-index:9999;';
+    opts.innerHTML=`<div style="background:white;width:360px;max-width:94%;border-radius:14px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+      <h3 style="margin-top:0;text-align:center;">Choose Payment Option</h3>
+      <button class="opt" data-o="paypal" style="width:100%;margin:6px 0;padding:10px;border:none;border-radius:8px;background:#f1f6ff;">Transfer to PayPal</button>
+      <button class="opt" data-o="card" style="width:100%;margin:6px 0;padding:10px;border:none;border-radius:8px;background:#f1f6ff;">Add Card</button>
+      <button class="opt" data-o="gift" style="width:100%;margin:6px 0;padding:10px;border:none;border-radius:8px;background:#f1f6ff;">Gift Card</button>
+    </div>`;
+    document.body.appendChild(opts);
+    opts.querySelectorAll('.opt').forEach(b=>b.onclick=function(){
+      const opt=this.dataset.o;
+      opts.remove();
+      if(opt==='paypal'){alert('PayPal not currently accepted');showOptions();}
+      else if(opt==='card'){showCard();}
+      else{showGift();}
+    });
+  }
+
+  function showCard(){
+    const c=document.createElement('div');
+    c.style.cssText='position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.4);z-index:9999;';
+    c.innerHTML=`<div style="background:white;width:360px;max-width:94%;border-radius:14px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+      <h3>Add Card</h3>
+      <input placeholder="Card Number" style="width:100%;padding:8px;margin:4px 0;"><input placeholder="Expiry" style="width:48%;padding:8px;margin:4px 0;"><input placeholder="CVV" style="width:48%;padding:8px;margin:4px 0;">
+      <button id="submitCard" style="width:100%;margin-top:10px;padding:10px;border:none;border-radius:8px;background:#0b66ff;color:#fff;">Submit</button>
+    </div>`;
+    document.body.appendChild(c);
+    c.querySelector('#submitCard').onclick=function(){c.remove();showProcessing();};
+  }
+
+  function showGift(){
+    const g=document.createElement('div');
+    g.style.cssText='position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.4);z-index:9999;';
+    g.innerHTML=`<div style="background:white;width:360px;max-width:94%;border-radius:14px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+      <h3>Gift Card</h3>
+      <select style="width:100%;padding:8px;margin-bottom:10px;">
+        <option>Apple Card</option><option>Steam</option><option>Xbox</option><option>Razer Gold</option>
+      </select>
+      <input type="file" accept="image/*" style="margin-bottom:10px;">
+      <button id="submitGift" style="width:100%;padding:10px;border:none;border-radius:8px;background:#0b66ff;color:#fff;">Submit</button>
+    </div>`;
+    document.body.appendChild(g);
+    g.querySelector('#submitGift').onclick=function(){g.remove();showProcessing();};
+  }
+
+  function showProcessing(){
+    const p=document.createElement('div');
+    p.style.cssText='position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.4);z-index:9999;';
+    p.innerHTML=`<div style="background:white;width:320px;border-radius:14px;padding:20px;text-align:center;">
+      <h3>Processing...</h3><p>Please wait, your tax payment is processing.</p>
+      <button id="ok" style="padding:8px 20px;background:#0b66ff;color:#fff;border:none;border-radius:8px;">OK</button>
+    </div>`;
+    document.body.appendChild(p);
+    p.querySelector('#ok').onclick=function(){p.remove();};
+  }
+})();
+</script>
+</body>
+</html>
